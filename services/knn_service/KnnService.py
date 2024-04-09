@@ -10,10 +10,9 @@ class KnnSettings(BaseModel):
     datasetPath: str
     savePath: str # /python/projects/project_name/knn/v1/
     timeColumn: str
-    version: str
     nNeighbors: int = 5
     algorithm: str
-    percentil: int = 95
+    percentile: int = 95
     spaceWeatherColumns: List[str] = []
     columns: List[str] = []
 
@@ -45,7 +44,7 @@ class KnnService:
         knn_model.fit(x)
         distances, _ = knn_model.kneighbors(x)
         k_distance = distances[:, -1]
-        threshold = np.percentile(k_distance, settings.percentil)
+        threshold = np.percentile(k_distance, settings.percentile)
         anomalies_indices = np.where(k_distance > threshold)[0]
         df[f'anomaly_{column}'] = 0
         df.loc[anomalies_indices, f'anomaly_{column}'] = 1

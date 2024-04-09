@@ -1,0 +1,1 @@
+docker build --tag kal/kal:0.1 .

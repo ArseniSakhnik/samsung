@@ -3,6 +3,7 @@ from typing import List
 from pydantic import BaseModel
 from sklearn.preprocessing import StandardScaler
 
+base_directory = './python/space__weathers'
 
 class DatasetSettings(BaseModel):
     path: str
@@ -36,25 +37,25 @@ class DatasetService:
             data.at[index, w] = nearest_value
 
     def load_wolf(self, df, time_column):
-        path = 'D:\\CommercialProjects\\Infragrad.Worker\\Infrastructure\\Mlsat.Sync\\Wolf.csv'
+        path = f'{base_directory}/Wolf.csv'
         wolf = pd.read_csv(path)
         wolf = wolf.rename(columns={'Date': time_column})
         self.add_space_weather(df, wolf, 'wolf', time_column)
 
     def load_ap(self, df, time_column):
-        path = 'D:\\CommercialProjects\\Infragrad.Worker\\Infrastructure\\Mlsat.Sync\\Ap.csv'
+        path = f'{base_directory}/Ap.csv'
         ap = pd.read_csv(path)
         ap = ap.rename(columns={'Date': time_column})
         self.add_space_weather(df, ap, 'ap', time_column)
 
     def load_dst(self, df, time_column):
-        path = 'D:\\CommercialProjects\\Infragrad.Worker\\Infrastructure\\Mlsat.Sync\\Dst.csv'
+        path = f'{base_directory}/Dst.csv'
         dst = pd.read_csv(path)
         dst = ap.rename(columns={'Date': time_column})
         self.add_space_weather(df, dst, 'dst', time_column)
 
     def load_kp(self, df, time_column):
-        path = 'D:\\CommercialProjects\\Infragrad.Worker\\Infrastructure\\Mlsat.Sync\\Kp.csv'
+        path = f'{base_directory}/Kp.csv'
         kp = pd.read_csv(path)
         kp = ap.rename(columns={'Date': time_column})
         self.add_space_weather(df, kp, 'kp', time_column)
@@ -104,6 +105,6 @@ class DatasetService:
         if hasTimeColumn and settings.isLoadDst:
             self.load_dst(df, settings.timeColumn)
 
-        df.to_csv(savePath)
+        df.to_csv(settings.savePath)
 
         return settings
