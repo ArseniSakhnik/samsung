@@ -2,6 +2,10 @@ import os
 import matplotlib
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
+import seaborn as sns
+import warnings
+
+warnings.filterwarnings('ignore')
 plt.ioff()
 
 class PlotService:
@@ -22,6 +26,20 @@ class PlotService:
         plt.legend()
         directory_path = f'{save_path}\\{column}'
         path = f'{directory_path}\\{column}_scutter.jpg'
+        self.create_folder_if_not_exist(directory_path)
+        plt.savefig(path)
+
+    def show_corr_matrix(self, df, anomaly, space_weather_columns, column, save_path):
+        columns = [anomaly]
+
+        for c in space_weather_columns:
+            columns.append(c)
+
+        for_corr_matrix = df[[column for column in columns]]
+        correlation_matrix = for_corr_matrix.corr()
+        sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+        directory_path = f'{save_path}\\{column}'
+        path = f'{directory_path}\\{column}_corr_matrix.jpg'
         self.create_folder_if_not_exist(directory_path)
         plt.savefig(path)
 

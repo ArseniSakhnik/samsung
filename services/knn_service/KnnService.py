@@ -53,9 +53,16 @@ class KnnService:
         for space_weather in settings.spaceWeatherColumns:
             self.plot_service.print_plot(df, anomalies_indices, column, settings.savePath, space_weather)
 
+        if len(settings.spaceWeatherColumns) != 0:
+            self.plot_service.show_corr_matrix(df,
+                                               f'anomaly_{column}',
+                                               settings.spaceWeatherColumns,
+                                               column,
+                                               settings.savePath)
+
 
     def learn(self, settings: KnnSettings):
         data = pd.read_csv(settings.datasetPath)
         for column in settings.columns:
             df = self.prepareData(data, column, settings.timeColumn, settings.spaceWeatherColumns)
-            self.knn(df, column, settings)
+            self.knn(df.head(5000), column, settings)
