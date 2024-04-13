@@ -1,27 +1,41 @@
 import pandas as pd
-from typing import List
+from typing import List, Dict, Optional
+from datetime import datetime
 from pydantic import BaseModel
 from sklearn.preprocessing import StandardScaler
 
 base_directory = './python/space__weathers'
 
+
+class SpaceWeatherPoint(BaseModel):
+    points: Dict[datetime, float]
+
+
 class DatasetSettings(BaseModel):
     path: str
     savePath: str
     isNormalize: bool
-    isLoadDst: bool
-    isLoadKp: bool
-    isLoadAp: bool
-    isLoadWolf: bool
     dropna: bool
     timeColumn: str = ''
-    columns: List[str] = []
+    columns: List[str] = [],
+    dst: Optional[Dict[datetime, float]] = None
+    kp: Optional[Dict[datetime, float]] = None
+    ap: Optional[Dict[datetime, float]] = None
+    wolf: Optional[Dict[datetime, float]] = None
 
 
 class DatasetService:
     def get_columns(self, path):
         df = pd.read_csv(path)
         return df.columns.tolist()
+
+    def get_dates(self, path, time_column):
+        df = pd.read_csv(path)
+        self.convert_values(df, time_column)
+        return {
+            "startDate": df[time_column].min(),
+            "endDate": df[time_column].max()
+        }
 
     def convert_values(self, df, time_column):
         df[time_column] = pd.to_datetime(df[time_column]).dt.tz_localize(None)
@@ -36,29 +50,36 @@ class DatasetService:
             nearest_value = nearest_row['Value'].values[0] if not nearest_row.empty else None
             data.at[index, w] = nearest_value
 
-    def load_wolf(self, df, time_column):
-        path = f'{base_directory}/Wolf.csv'
-        wolf = pd.read_csv(path)
-        wolf = wolf.rename(columns={'Date': time_column})
+    def get_points(self, points: Dict[datetime, float], time_column):
+        response = {
+            f'{time_column}': [],
+            'Value': []
+        }
+
+        for key, value in points.items():
+            response[f'{time_column}'].append(key)
+            response['Value'].append(value)
+
+        df = pd.DataFrame(response)
+
+        return df
+
+    def load_wolf(self, df, time_column, points: Dict[datetime, float]):
+        wolf = self.get_points(points, time_column)
         self.add_space_weather(df, wolf, 'wolf', time_column)
 
-    def load_ap(self, df, time_column):
-        path = f'{base_directory}/Ap.csv'
-        ap = pd.read_csv(path)
-        ap = ap.rename(columns={'Date': time_column})
+    def load_ap(self, df, time_column, points: Dict[datetime, float]):
+        ap = self.get_points(points, time_column)
         self.add_space_weather(df, ap, 'ap', time_column)
 
-    def load_dst(self, df, time_column):
-        path = f'{base_directory}/Dst.csv'
-        dst = pd.read_csv(path)
-        dst = ap.rename(columns={'Date': time_column})
+    def load_dst(self, df, time_column, points: Dict[datetime, float]):
+        dst = self.get_points(points, time_column)
         self.add_space_weather(df, dst, 'dst', time_column)
 
-    def load_kp(self, df, time_column):
-        path = f'{base_directory}/Kp.csv'
-        kp = pd.read_csv(path)
-        kp = ap.rename(columns={'Date': time_column})
+    def load_kp(self, df, time_column, points: Dict[datetime, float]):
+        kp = self.get_points(points, time_column)
         self.add_space_weather(df, kp, 'kp', time_column)
+
 
     def create_on_basis(self, settings: DatasetSettings):
         scaler = StandardScaler()
@@ -93,17 +114,17 @@ class DatasetService:
         if hasTimeColumn:
             self.convert_values(df, settings.timeColumn)
 
-        if hasTimeColumn and settings.isLoadWolf:
-            self.load_wolf(df, settings.timeColumn)
+        if hasTimeColumn and settings.wolf != None:
+            self.load_wolf(df, settings.timeColumn, settings.wolf)
 
-        if hasTimeColumn and settings.isLoadAp:
-            self.load_ap(df, settings.timeColumn)
+        if hasTimeColumn and settings.ap != None:
+            self.load_ap(df, settings.timeColumn, settings.ap)
 
-        if hasTimeColumn and settings.isLoadKp:
-            self.load_kp(df, settings.timeColumn)
+        if hasTimeColumn and settings.kp != None:
+            self.load_kp(df, settings.timeColumn, settings.kp)
 
-        if hasTimeColumn and settings.isLoadDst:
-            self.load_dst(df, settings.timeColumn)
+        if hasTimeColumn and settings.dst != None:
+            self.load_dst(df, settings.timeColumn, settings.dst)
 
         df.to_csv(settings.savePath)
 

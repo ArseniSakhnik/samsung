@@ -18,6 +18,10 @@ async def get_columns(path: str):
 async def create_on_basis(datasetSettings: DatasetSettings):
     return {"result": dataset_service.create_on_basis(datasetSettings)}
 
+@app.get("/datasets/dates")
+async def get_min_and_max_dates(path: str, time_column: str):
+    return dataset_service.get_dates(path, time_column)
+
 @app.post("/models/knn")
 async def knn(knnSettings: KnnSettings):
     return {"result": knn_service.learn(settings=knnSettings)}
