@@ -7,6 +7,7 @@ from services.isolation_forest_service.IsolationForestService import IsloationFo
 from services.lof_service.LofService import LofSettings, LofService
 from services.auto_encoder.AutoEncoderService import AutoEncoderSettings, AutoEncoderService
 from services.siamese_autoencoder.SiameseAutoencoderService import SiameseAutoEncoderSettings, SiameseAutoencoderService
+from services.gan_encoder.GanService import GanSettings, GanService
 
 # Создаем объект FastAPI
 app = FastAPI()
@@ -16,6 +17,7 @@ isolation_forest_service = IsolationForestService()
 lof_service = LofService()
 autoencoder_service = AutoEncoderService()
 siamese_autoencoder_service = SiameseAutoencoderService()
+gan_service = GanService()
 
 
 # datasets
@@ -55,6 +57,11 @@ async def autoencoder(settings: AutoEncoderSettings):
 @app.post("/models/siamese-autoencoder")
 async def siamese_autoencoder(settings: SiameseAutoEncoderSettings):
     siamese_autoencoder_service.learn(settings)
+    return {}
+
+@app.post("/models/gan")
+async def gan(settings: GanSettings):
+    gan_service.learn(settings)
     return {}
 
 
