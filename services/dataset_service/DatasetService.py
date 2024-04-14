@@ -1,5 +1,6 @@
 import pandas as pd
 from typing import List, Dict, Optional
+import numpy as np
 from datetime import datetime
 from pydantic import BaseModel
 from sklearn.preprocessing import StandardScaler
@@ -157,3 +158,18 @@ class DatasetService:
         df.to_csv(settings.savePath)
 
         return settings
+    def prepareData(self, data, column, time_column, space_wather_columns):
+        columns = []
+        columns.append(column)
+        if len(time_column) != 0:
+            columns.append(time_column)
+
+        for item in space_wather_columns:
+            columns.append(item)
+
+        df = data[columns]
+        df['index'] = df.reset_index().index + 1
+        df.rename(columns={time_column: 'timestamp'}, inplace=True)
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['time_epoch'] = (df['timestamp'].astype(np.int64) / 100000000000).astype(np.int64)
+        return df

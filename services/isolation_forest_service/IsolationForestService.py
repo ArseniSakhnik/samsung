@@ -2,38 +2,34 @@ import pandas as pd
 from pydantic import BaseModel
 from typing import List
 import numpy as np
-from sklearn.neighbors import NearestNeighbors
+from sklearn.ensemble import IsolationForest
 from services.plot_service.PlotService import PlotService
 from services.dataset_service.DatasetService import DatasetService
 
-
-class KnnSettings(BaseModel):
+class IsloationForestSettings(BaseModel):
     datasetPath: str
     savePath: str
     timeColumn: str
-    nNeighbors: int = 5
-    algorithm: str
-    percentile: int = 95
     spaceWeatherColumns: List[str] = []
     columns: List[str] = []
+    # гиперпараметры
+    contamination: float
 
-
-class KnnService:
+class IsolationForestService:
     def __init__(self) -> None:
         self.plot_service = PlotService()
         self.data_service = DatasetService()
         super().__init__()
 
-    def knn(self, df, column, settings: KnnSettings):
+    def isolation_forest(self, df, column, settings: IsloationForestSettings):
         x = df[[column]]
         # модель
-        knn_model = NearestNeighbors(n_neighbors=settings.nNeighbors, algorithm=settings.algorithm)
-        knn_model.fit(x)
-        distances, _ = knn_model.kneighbors(x)
-        k_distance = distances[:, -1]
-        threshold = np.percentile(k_distance, settings.percentile)
+        # Обучим модель IF на данных
+        if_model = IsolationForest(contamination=settings.contamination)  # Параметры можно настраивать
+        if_model.fit(x)
+        y_pred = if_model.predict(x)
+        anomalies_indices = np.where(y_pred == -1)[0]
         # модель
-        anomalies_indices = np.where(k_distance > threshold)[0]
         df[f'anomaly_{column}'] = 0
         df.loc[anomalies_indices, f'anomaly_{column}'] = 1
 
@@ -51,9 +47,9 @@ class KnnService:
 
         self.data_service.save_csv(df, column, settings.savePath)
 
-    def learn(self, settings: KnnSettings):
+    def learn(self, settings: IsloationForestSettings):
         data = pd.read_csv(settings.datasetPath)
         self.data_service.minimal_processing(data, settings.timeColumn)
         for column in settings.columns:
             df = self.data_service.prepareData(data, column, settings.timeColumn, settings.spaceWeatherColumns)
-            self.knn(df, column, settings)
+            self.isolation_forest(df.head(5000), column, settings)
