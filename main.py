@@ -5,6 +5,7 @@ from services.dataset_service.DatasetService import DatasetService, DatasetSetti
 from services.knn_service.KnnService import KnnSettings, KnnService
 from services.isolation_forest_service.IsolationForestService import IsloationForestSettings, IsolationForestService
 from services.lof_service.LofService import LofSettings, LofService
+from services.auto_encoder.AutoEncoderService import AutoEncoderSettings, AutoEncoderService
 
 # Создаем объект FastAPI
 app = FastAPI()
@@ -12,6 +13,7 @@ dataset_service = DatasetService()
 knn_service = KnnService()
 isolation_forest_service = IsolationForestService()
 lof_service = LofService()
+autoencoder_service = AutoEncoderService()
 
 
 # datasets
@@ -43,6 +45,11 @@ async def isolation_forest(settings: IsloationForestSettings):
 @app.post("/models/lof")
 async def log(settings: LofSettings):
     return {"result": lof_service.learn(settings)}
+
+@app.post("/models/autoencoder")
+async def autoencoder(settings: AutoEncoderSettings):
+    return {"result": autoencoder_service.learn(settings)}
+
 
 
 def custom_openapi():
