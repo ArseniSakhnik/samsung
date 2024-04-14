@@ -31,6 +31,7 @@ class PlotService:
 
     def show_corr_matrix(self, df, anomaly, space_weather_columns, column, save_path):
         columns = [anomaly]
+        sns.reset_defaults()
 
         for c in space_weather_columns:
             columns.append(c)
