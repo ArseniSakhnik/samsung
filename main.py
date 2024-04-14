@@ -6,6 +6,7 @@ from services.knn_service.KnnService import KnnSettings, KnnService
 from services.isolation_forest_service.IsolationForestService import IsloationForestSettings, IsolationForestService
 from services.lof_service.LofService import LofSettings, LofService
 from services.auto_encoder.AutoEncoderService import AutoEncoderSettings, AutoEncoderService
+from services.siamese_autoencoder.SiameseAutoencoderService import SiameseAutoEncoderSettings, SiameseAutoencoderService
 
 # Создаем объект FastAPI
 app = FastAPI()
@@ -14,6 +15,7 @@ knn_service = KnnService()
 isolation_forest_service = IsolationForestService()
 lof_service = LofService()
 autoencoder_service = AutoEncoderService()
+siamese_autoencoder_service = SiameseAutoencoderService()
 
 
 # datasets
@@ -49,6 +51,11 @@ async def log(settings: LofSettings):
 @app.post("/models/autoencoder")
 async def autoencoder(settings: AutoEncoderSettings):
     return {"result": autoencoder_service.learn(settings)}
+
+@app.post("/models/siamese-autoencoder")
+async def siamese_autoencoder(settings: SiameseAutoEncoderSettings):
+    siamese_autoencoder_service.learn(settings)
+    return {}
 
 
 
