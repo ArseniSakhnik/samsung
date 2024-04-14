@@ -117,4 +117,4 @@ class SiameseAutoencoderService:
         self.data_service.minimal_processing(data, settings.timeColumn)
         for column in settings.columns:
             df = self.data_service.prepareData(data, column, settings.timeColumn, settings.spaceWeatherColumns)
-            self.siamese_autoencoder(df.head(5000), column, settings)
+            self.siamese_autoencoder(df, column, settings)

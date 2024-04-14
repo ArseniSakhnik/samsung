@@ -52,4 +52,4 @@ class IsolationForestService:
         self.data_service.minimal_processing(data, settings.timeColumn)
         for column in settings.columns:
             df = self.data_service.prepareData(data, column, settings.timeColumn, settings.spaceWeatherColumns)
-            self.isolation_forest(df.head(5000), column, settings)
+            self.isolation_forest(df, column, settings)
