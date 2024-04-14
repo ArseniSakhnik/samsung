@@ -4,12 +4,14 @@ from typing import Annotated
 from services.dataset_service.DatasetService import DatasetService, DatasetSettings
 from services.knn_service.KnnService import KnnSettings, KnnService
 from services.isolation_forest_service.IsolationForestService import IsloationForestSettings, IsolationForestService
+from services.lof_service.LofService import LofSettings, LofService
 
 # Создаем объект FastAPI
 app = FastAPI()
 dataset_service = DatasetService()
 knn_service = KnnService()
 isolation_forest_service = IsolationForestService()
+lof_service = LofService()
 
 
 # datasets
@@ -36,6 +38,11 @@ async def knn(knnSettings: KnnSettings):
 @app.post("/models/isolation_forest")
 async def isolation_forest(settings: IsloationForestSettings):
     return {"result": isolation_forest_service.learn(settings)}
+
+
+@app.post("/models/lof")
+async def log(settings: LofSettings):
+    return {"result": lof_service.learn(settings)}
 
 
 def custom_openapi():
