@@ -1,0 +1,14 @@
+{
+  "path": "D:\\tmp\\python\\Привет это я твой тестовый проект\\datasets\\File.csv",
+  "savePath": "D:\\tmp\\python\\projects\\Привет это я твой тестовый проект\\data_sources\\test.csv",
+  "isNormalize": false,
+  "isLoadDst": false,
+  "isLoadKp": false,
+  "isLoadAp": false,
+  "isLoadWolf": false,
+  "isNaDropped": true,
+  "timeColumn": "time",
+  "columns": [
+    "t_amp"
+  ]
+}

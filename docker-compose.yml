@@ -1,0 +1,54 @@
+version: '3.9'
+
+services:
+  frontend:
+    restart: on-failure
+    container_name: "frontend"
+    build:
+      context: .\frontend
+      dockerfile: Dockerfile
+    ports: 
+      - "80:80"
+    volumes:
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf
+  
+  backend:
+    restart: on-failure
+    container_name: "backend"
+    build:
+      context: .\backend
+      dockerfile: Dockerfile
+    ports:
+      - "82:80"
+    volumes:
+      - sources:/mlsat
+    depends_on:
+      - postgres
+  
+  models:
+    restart: on-failure
+    container_name: "models"
+    build:
+      context: .\models
+      dockerfile: Dockerfile
+    ports:
+      - "81:80"
+    volumes:
+      - sources:/mlsat
+
+  postgres:
+    restart: on-failure
+    container_name: "postgresql"
+    image: "postgres:13.3"
+    environment:
+      POSTGRES_DB: "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+    ports:
+      - "5433:5432"
+    volumes:
+      - database:/var/lib/postgresql/data
+
+volumes:
+  database:
+  sources:
